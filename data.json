@@ -596,5 +596,39 @@
         "notes": ""
       }
     ]
+  },
+  {
+    "name": "JUL 2026",
+    "gold": 63.5,
+    "usd": 600,
+    "egpBalance": 56000,
+    "bank": 51000,
+    "vfCash": 3000,
+    "cash": 2000,
+    "totalEGP": 529865,
+    "expenses": 33800,
+    "saveDeficit": 8390,
+    "rateGold": 6990,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 40000,
+        "notes": "SALARY"
+      },
+      {
+        "gold": 0,
+        "usd": 100,
+        "egp": -5000,
+        "notes": "TO CIB"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 4500,
+        "notes": "COURSE"
+      }
+    ]
   }
 ]
