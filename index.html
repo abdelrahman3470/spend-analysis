@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal Spend Analysis Dashboard — Track Gold, USD, and EGP holdings monthly with interactive charts and conversion rates.">
+    <title>Spend Analysis Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <style>
+        /* ══════════════════════════════════════════════════════════
+           DESIGN SYSTEM
+           ══════════════════════════════════════════════════════════ */
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: rgba(17, 24, 39, 0.7);
+            --bg-card-hover: rgba(30, 41, 59, 0.8);
+            --bg-input: rgba(15, 23, 42, 0.9);
+            --border: rgba(99, 102, 241, 0.15);
+            --border-focus: rgba(99, 102, 241, 0.5);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-indigo: #818cf8;
+            --accent-violet: #a78bfa;
+            --accent-emerald: #34d399;
+            --accent-amber: #fbbf24;
+            --accent-rose: #fb7185;
+            --accent-cyan: #22d3ee;
+            --accent-blue: #60a5fa;
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+            --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            --gradient-usd: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            --gradient-egp: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            --gradient-expense: linear-gradient(135deg, #ef4444 0%, #fb7185 100%);
+            --gradient-save: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           BACKGROUND EFFECTS
+           ══════════════════════════════════════════════════════════ */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse 800px 600px at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 500px at 80% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 400px at 50% 50%, rgba(59, 130, 246, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           LAYOUT
+           ══════════════════════════════════════════════════════════ */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px 60px;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           HEADER
+           ══════════════════════════════════════════════════════════ */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0 32px;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            font-weight: 400;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           NAV TABS
+           ══════════════════════════════════════════════════════════ */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 36px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 10px 24px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .nav-tab:hover {
+            border-color: var(--accent-indigo);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .nav-tab.active {
+            background: var(--gradient-primary);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           TAB CONTENT
+           ══════════════════════════════════════════════════════════ */
+        .tab-content {
+            display: none;
+            animation: fadeSlideIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           CARDS
+           ══════════════════════════════════════════════════════════ */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.25);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .icon-gold { background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.1)); }
+        .icon-usd { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.1)); }
+        .icon-egp { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.1)); }
+        .icon-chart { background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(167, 139, 250, 0.1)); }
+
+        /* ══════════════════════════════════════════════════════════
+           SUMMARY CARDS ROW
+           ══════════════════════════════════════════════════════════ */
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 3px;
+        }
+
+        .summary-card.gold::before { background: var(--gradient-gold); }
+        .summary-card.usd::before { background: var(--gradient-usd); }
+        .summary-card.egp::before { background: var(--gradient-egp); }
+        .summary-card.total::before { background: var(--gradient-primary); }
+        .summary-card.expense::before { background: var(--gradient-expense); }
+        .summary-card.save::before { background: var(--gradient-save); }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .summary-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .summary-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           FORMS
+           ══════════════════════════════════════════════════════════ */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           TRANSACTIONS TABLE (inside form)
+           ══════════════════════════════════════════════════════════ */
+        .transactions-container {
+            margin-top: 20px;
+        }
+
+        .tx-header-row, .tx-row {
+            display: grid;
+            grid-template-columns: 40px 1fr 1fr 1fr 1.5fr 40px;
+            gap: 8px;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .tx-header-row {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+        }
+
+        .tx-header-row span {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tx-row input {
+            padding: 10px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .tx-row input:focus {
+            border-color: var(--border-focus);
+        }
+
+        .tx-row .tx-num {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .tx-remove-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: rgba(239, 68, 85, 0.1);
+            color: var(--accent-rose);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .tx-remove-btn:hover {
+            background: rgba(239, 68, 85, 0.25);
+            transform: scale(1.1);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           BUTTONS
+           ══════════════════════════════════════════════════════════ */
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-indigo);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 85, 0.1);
+            color: var(--accent-rose);
+            border: 1px solid rgba(239, 68, 85, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 85, 0.2);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           DATA TABLE
+           ══════════════════════════════════════════════════════════ */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.85rem;
+        }
+
+        thead th {
+            background: rgba(99, 102, 241, 0.08);
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.8px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        thead th:first-child {
+            text-align: left;
+            border-radius: var(--radius-sm) 0 0 0;
+        }
+
+        thead th:last-child {
+            border-radius: 0 var(--radius-sm) 0 0;
+        }
+
+        tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.06);
+            color: var(--text-primary);
+            text-align: right;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        tbody td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent-indigo);
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: rgba(99, 102, 241, 0.04);
+        }
+
+        tbody tr:hover td {
+            color: #fff;
+        }
+
+        .positive { color: var(--accent-emerald) !important; }
+        .negative { color: var(--accent-rose) !important; }
+
+        .delete-month-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(239, 68, 85, 0.1);
+            color: var(--accent-rose);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .delete-month-btn:hover {
+            background: rgba(239, 68, 85, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           CHART
+           ══════════════════════════════════════════════════════════ */
+        .chart-container {
+            position: relative;
+            height: 450px;
+            width: 100%;
+        }
+
+        .chart-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .chart-filter-btn {
+            padding: 7px 16px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chart-filter-btn.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--accent-indigo);
+            color: var(--accent-indigo);
+        }
+
+        .chart-filter-btn:hover {
+            border-color: var(--accent-indigo);
+            color: var(--accent-indigo);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           CONVERSION RATE SECTION
+           ══════════════════════════════════════════════════════════ */
+        .rate-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .rate-card {
+            padding: 18px 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .rate-card.gold-rate {
+            border-left: 3px solid #fbbf24;
+        }
+
+        .rate-card.usd-rate {
+            border-left: 3px solid #34d399;
+        }
+
+        .rate-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rate-card input {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .rate-card input:focus {
+            border-color: var(--border-focus);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           EGP BREAKDOWN
+           ══════════════════════════════════════════════════════════ */
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .breakdown-item {
+            padding: 14px 16px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .breakdown-item label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .breakdown-item input {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .breakdown-item input:focus {
+            border-color: var(--border-focus);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           MODAL
+           ══════════════════════════════════════════════════════════ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 36px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 85, 0.1);
+            color: var(--accent-rose);
+            border-color: rgba(239, 68, 85, 0.3);
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section h3 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           TOAST
+           ══════════════════════════════════════════════════════════ */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 14px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.success { border-left: 3px solid var(--accent-emerald); }
+        .toast.error { border-left: 3px solid var(--accent-rose); }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           SCROLLBAR
+           ══════════════════════════════════════════════════════════ */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           RESPONSIVE
+           ══════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .app-container { padding: 16px; }
+            .header h1 { font-size: 1.8rem; }
+            .summary-value { font-size: 1.3rem; }
+            .chart-container { height: 300px; }
+            .tx-header-row, .tx-row {
+                grid-template-columns: 30px 1fr 1fr 1fr 1fr 30px;
+                gap: 4px;
+            }
+            .modal { padding: 24px; width: 95%; }
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           MONTH SELECTOR PILLS
+           ══════════════════════════════════════════════════════════ */
+        .month-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .month-pill {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .month-pill:hover {
+            border-color: var(--accent-indigo);
+            color: var(--text-primary);
+        }
+
+        .month-pill.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--accent-indigo);
+            color: var(--accent-indigo);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .emoji {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .section-divider {
+            border: none;
+            height: 1px;
+            background: var(--border);
+            margin: 24px 0;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           DOWNLOAD BUTTON
+           ══════════════════════════════════════════════════════════ */
+        .btn-download {
+            padding: 10px 24px;
+            border: none;
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: #fff;
+            border-radius: 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 4px 30px rgba(16, 185, 129, 0.5); }
+        }
+
+        .download-reminder {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: var(--radius-md);
+            padding: 14px 20px;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--accent-emerald);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="header" id="header">
+            <h1>💎 Spend Analysis</h1>
+            <p>Monthly Portfolio Tracker — Gold · USD · EGP</p>
+        </header>
+
+        <!-- NAV TABS -->
+        <nav class="nav-tabs" id="navTabs">
+            <button class="nav-tab active" data-tab="dashboard" id="nav-dashboard">📊 Dashboard</button>
+            <button class="nav-tab" data-tab="table" id="nav-table">📋 All Months</button>
+            <button class="nav-tab" data-tab="chart" id="nav-chart">📈 Charts</button>
+            <button class="nav-tab" data-tab="add" id="nav-add">➕ Add Month</button>
+            <button class="btn-download" onclick="downloadHTML()" id="btnDownload">📥 Download & Share</button>
+        </nav>
+
+        <!-- ═══════════ TAB: DASHBOARD ═══════════ -->
+        <div class="tab-content active" id="tab-dashboard">
+            <div class="summary-row" id="summaryCards">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon icon-chart">📊</span>
+                    Quick Overview — Last Month
+                </div>
+                <div id="lastMonthDetail">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon icon-chart">📈</span>
+                    Total Portfolio Value Trend
+                </div>
+                <div class="chart-container">
+                    <canvas id="miniChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ TAB: ALL MONTHS TABLE ═══════════ -->
+        <div class="tab-content" id="tab-table">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon icon-chart">📋</span>
+                    Monthly Spend Analysis
+                </div>
+                <div class="table-wrapper">
+                    <table id="monthsTable">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left">Month</th>
+                                <th>Gold (gm)</th>
+                                <th>USD</th>
+                                <th>EGP Balance</th>
+                                <th>Bank</th>
+                                <th>VF-Cash</th>
+                                <th>Cash</th>
+                                <th>Total (EGP)</th>
+                                <th>Expenses</th>
+                                <th>Save/Deficit</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthsTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ TAB: CHARTS ═══════════ -->
+        <div class="tab-content" id="tab-chart">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon icon-chart">📊</span>
+                    Monthly Comparison
+                </div>
+                <div class="chart-filters" id="chartFilters">
+                    <button class="chart-filter-btn active" data-series="totalEGP" id="filter-total">Total EGP</button>
+                    <button class="chart-filter-btn active" data-series="expenses" id="filter-expenses">Expenses</button>
+                    <button class="chart-filter-btn active" data-series="saveDeficit" id="filter-save">Save/Deficit</button>
+                    <button class="chart-filter-btn" data-series="gold" id="filter-gold">Gold (gm)</button>
+                    <button class="chart-filter-btn" data-series="usd" id="filter-usd">USD</button>
+                    <button class="chart-filter-btn" data-series="egpBalance" id="filter-egp">EGP Balance</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon icon-gold">🪙</span>
+                    Gold Holdings Over Time
+                </div>
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="goldChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon icon-usd">💵</span>
+                    USD Holdings Over Time
+                </div>
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="usdChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ TAB: ADD MONTH ═══════════ -->
+        <div class="tab-content" id="tab-add">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon icon-chart">➕</span>
+                    Add New Month
+                </div>
+
+                <!-- Month Name -->
+                <div class="form-grid" style="margin-bottom: 24px;">
+                    <div class="form-group">
+                        <label>Month Name</label>
+                        <input type="text" id="newMonthName" placeholder="e.g. JUL 2026">
+                    </div>
+                </div>
+
+                <!-- Previous Month (auto-populated) -->
+                <div class="modal-section">
+                    <h3 style="font-size:0.92rem; font-weight:700; color:var(--text-secondary); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">Previous Month Balance (Auto-filled)</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Gold (gm)</label>
+                            <input type="number" id="prevGold" step="0.01" readonly style="opacity:0.6;">
+                        </div>
+                        <div class="form-group">
+                            <label>USD</label>
+                            <input type="number" id="prevUSD" step="0.01" readonly style="opacity:0.6;">
+                        </div>
+                        <div class="form-group">
+                            <label>EGP</label>
+                            <input type="number" id="prevEGP" step="0.01" readonly style="opacity:0.6;">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Conversion Rates -->
+                <div class="modal-section">
+                    <h3 style="font-size:0.92rem; font-weight:700; color:var(--text-secondary); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">⚡ Conversion Rates (to EGP)</h3>
+                    <div class="rate-inputs">
+                        <div class="rate-card gold-rate">
+                            <div class="rate-label">🪙 1 Gram Gold 24K → EGP</div>
+                            <input type="number" id="rateGold" step="0.01" placeholder="e.g. 5300">
+                        </div>
+                        <div class="rate-card usd-rate">
+                            <div class="rate-label">💵 1 USD → EGP</div>
+                            <input type="number" id="rateUSD" step="0.01" placeholder="e.g. 50">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Transactions -->
+                <div class="modal-section">
+                    <h3 style="font-size:0.92rem; font-weight:700; color:var(--text-secondary); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">Transactions</h3>
+                    <div class="transactions-container">
+                        <div class="tx-header-row">
+                            <span>#</span>
+                            <span>Gold (gm)</span>
+                            <span>USD</span>
+                            <span>EGP</span>
+                            <span>Notes</span>
+                            <span></span>
+                        </div>
+                        <div id="txRows">
+                            <!-- Populated by JS -->
+                        </div>
+                        <button class="btn btn-secondary" onclick="addTransactionRow()" id="btnAddTx" style="margin-top: 12px;">
+                            + Add Transaction
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- EGP Breakdown (User Inputs) -->
+                <div class="modal-section">
+                    <h3 style="font-size:0.92rem; font-weight:700; color:var(--text-secondary); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">💰 Current EGP Breakdown</h3>
+                    <div class="breakdown-grid">
+                        <div class="breakdown-item">
+                            <label>Bank</label>
+                            <input type="number" id="bdBank" step="0.01" placeholder="0">
+                        </div>
+                        <div class="breakdown-item">
+                            <label>VF-Cash</label>
+                            <input type="number" id="bdVFCash" step="0.01" placeholder="0">
+                        </div>
+                        <div class="breakdown-item">
+                            <label>Cash</label>
+                            <input type="number" id="bdCash" step="0.01" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="saveMonth()" id="btnSaveMonth">💾 Save Month</button>
+                    <button class="btn btn-secondary" onclick="resetForm()" id="btnResetForm">🔄 Reset Form</button>
+                </div>
+
+                <div class="download-reminder">
+                    💡 After adding a month, click <strong>&nbsp;📥 Download & Share&nbsp;</strong> to save the updated file. The downloaded HTML contains ALL your data and can be shared with anyone!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ══════════════════════════════════════════════════════════
+        // DATA STORE
+        // ══════════════════════════════════════════════════════════
+
+        /*__DATA_START__*/
+        const DEFAULT_DATA = [
+            {
+                name: "APR '25", gold: 20.75, usd: 2250, egpBalance: 20900,
+                bank: 16700, vfCash: 200, cash: 1000,
+                totalEGP: 287853, expenses: 9250, saveDeficit: 24734,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0.25, usd: 100, egp: 17100, notes: '' },
+                    { gold: 0.5, usd: -50, egp: 14000, notes: '' },
+                    { gold: 0, usd: -200, egp: 3500, notes: '' },
+                    { gold: 0, usd: 50, egp: 0, notes: '' }
+                ]
+            },
+            {
+                name: "MAY '25", gold: 20.75, usd: 2200, egpBalance: 47000,
+                bank: 37400, vfCash: 3600, cash: 5000,
+                totalEGP: 289576, expenses: 3600, saveDeficit: 23723,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0, usd: -50, egp: 11800, notes: '' },
+                    { gold: 0, usd: 0, egp: 15400, notes: '' }
+                ]
+            },
+            {
+                name: "JUN '25", gold: 20.75, usd: 2300, egpBalance: 62300,
+                bank: 55800, vfCash: 2500, cash: 3000,
+                totalEGP: 309630, expenses: 14100, saveDeficit: 20054,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0, usd: 100, egp: 16650, notes: '' },
+                    { gold: 0, usd: 0, egp: 12500, notes: '' },
+                    { gold: 0, usd: 0, egp: -2750, notes: '' },
+                    { gold: 0, usd: 0, egp: 5000, notes: '' },
+                    { gold: 0, usd: 0, egp: 1500, notes: '' },
+                    { gold: 0, usd: 0, egp: -3500, notes: '' }
+                ]
+            },
+            {
+                name: "JUL '25", gold: 30.75, usd: 2600, egpBalance: 27050,
+                bank: 22800, vfCash: 250, cash: 4000,
+                totalEGP: 355142, expenses: 11350, saveDeficit: 45512,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 10, usd: 100, egp: 16400, notes: 'EURO' },
+                    { gold: 0, usd: 200, egp: 20000, notes: 'SUNJEC' },
+                    { gold: 0, usd: 0, egp: -2550, notes: 'S.F_SUNJEC' },
+                    { gold: 0, usd: 0, egp: -450, notes: 'M.A_SUNJEC' },
+                    { gold: 0, usd: 0, egp: -53700, notes: '10 GM BTC' },
+                    { gold: 0, usd: 0, egp: -3600, notes: 'MSC' }
+                ]
+            },
+            {
+                name: "AUG '25", gold: 30.75, usd: 2600, egpBalance: 47400,
+                bank: 46000, vfCash: 400, cash: 1000,
+                totalEGP: 375492, expenses: 11850, saveDeficit: 20350,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0, usd: 0, egp: 20100, notes: 'EURO' },
+                    { gold: 0, usd: 0, egp: 14350, notes: 'SUNJEC' },
+                    { gold: 0, usd: 0, egp: -2250, notes: 'M.A_SUNJEC' }
+                ]
+            },
+            {
+                name: "SEP1 '25", gold: 30.50, usd: 2600, egpBalance: 51600,
+                bank: 14000, vfCash: 600, cash: 37000,
+                totalEGP: 378029, expenses: 10050, saveDeficit: 2538,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: -0.25, usd: 0, egp: 19250, notes: 'GOLD COIN 0.5' },
+                    { gold: 0, usd: 0, egp: -5000, notes: 'LEND KAREEM' }
+                ]
+            },
+            {
+                name: "SEP2 '25", gold: 30.50, usd: 2600, egpBalance: 32300,
+                bank: 29000, vfCash: 300, cash: 3000,
+                totalEGP: 358729, expenses: 31900, saveDeficit: -19300,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0, usd: 0, egp: 17600, notes: 'Salary' },
+                    { gold: 0, usd: 0, egp: -5000, notes: 'Lend Kareem' }
+                ]
+            },
+            {
+                name: "OCT '25", gold: 42.50, usd: 1400, egpBalance: 27800,
+                bank: 19400, vfCash: 2700, cash: 5700,
+                totalEGP: 376981, expenses: 15800, saveDeficit: 18252,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 10, usd: -1200, egp: 0, notes: '' },
+                    { gold: 2, usd: 0, egp: 0, notes: '' },
+                    { gold: 0, usd: 0, egp: 0, notes: 'Salary' },
+                    { gold: 0, usd: 0, egp: -1000, notes: 'Lent Sara' },
+                    { gold: 0, usd: 0, egp: -11600, notes: 'SILVER' },
+                    { gold: 0, usd: 0, egp: -64700, notes: 'GOLD 4*2.5' },
+                    { gold: 0, usd: 0, egp: 57000, notes: '1200 USD TO EGP' }
+                ]
+            },
+            {
+                name: "NOV '25", gold: 45.00, usd: 1400, egpBalance: 31350,
+                bank: 29000, vfCash: 2000, cash: 350,
+                totalEGP: 397072, expenses: 9120, saveDeficit: 20175,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 2.5, usd: 0, egp: 29000, notes: 'Salary' },
+                    { gold: 0, usd: 0, egp: -16330, notes: '2.5 GM 24K' }
+                ]
+            },
+            {
+                name: "DEC '25", gold: 45.00, usd: 1400, egpBalance: 52900,
+                bank: 51950, vfCash: 650, cash: 300,
+                totalEGP: 418944, expenses: 10950, saveDeficit: 21872,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0, usd: 0, egp: 32500, notes: 'Salary' }
+                ]
+            },
+            {
+                name: "JAN '26", gold: 50.00, usd: 1400, egpBalance: 35100,
+                bank: 32000, vfCash: 800, cash: 2300,
+                totalEGP: 526894, expenses: 10400, saveDeficit: 25022,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 5, usd: 0, egp: 32000, notes: 'Salary' },
+                    { gold: 0, usd: 0, egp: -34600, notes: '2.5 GOLD' },
+                    { gold: 0, usd: 0, egp: -2200, notes: 'LENT SARA' },
+                    { gold: 0, usd: 0, egp: -1000, notes: 'ABY' },
+                    { gold: 0, usd: 0, egp: -1600, notes: 'SARA DOCTOR' }
+                ]
+            },
+            {
+                name: "FEB '26", gold: 50.00, usd: 1400, egpBalance: 67800,
+                bank: 60500, vfCash: 300, cash: 7000,
+                totalEGP: 555600, expenses: 18550, saveDeficit: 32700,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0, usd: 0, egp: 36250, notes: 'Salary' },
+                    { gold: 0, usd: 0, egp: 5000, notes: 'ANNUAL RAISE' },
+                    { gold: 0, usd: 0, egp: 5000, notes: 'KAREEM LENT' },
+                    { gold: 0, usd: 0, egp: 5000, notes: 'Mistake ANNUAL RAISE' }
+                ]
+            },
+            {
+                name: "MAR '26", gold: 57.50, usd: 1400, egpBalance: 16200,
+                bank: 12300, vfCash: 800, cash: 3100,
+                totalEGP: 566250, expenses: 17800, saveDeficit: 10650,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0, usd: 0, egp: 29500, notes: 'Salary' },
+                    { gold: 5, usd: 0, egp: -42300, notes: '' },
+                    { gold: 2.5, usd: 0, egp: -21000, notes: '' }
+                ]
+            },
+            {
+                name: "APR '26", gold: 57.50, usd: 1400, egpBalance: 43000,
+                bank: 38600, vfCash: 1000, cash: 3400,
+                totalEGP: 577900, expenses: 7200, saveDeficit: 26800,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0, usd: 0, egp: 34000, notes: 'Salary' }
+                ]
+            },
+            {
+                name: "MAY '26", gold: 61.00, usd: 1400, egpBalance: 37400,
+                bank: 25500, vfCash: 2100, cash: 9800,
+                totalEGP: 600300, expenses: 9600, saveDeficit: 22400,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 2.5, usd: 0, egp: 35200, notes: 'Salary' },
+                    { gold: 1, usd: 0, egp: -19800, notes: '' },
+                    { gold: 0, usd: 0, egp: -7900, notes: '' },
+                    { gold: 0, usd: 0, egp: -3500, notes: 'Car License' }
+                ]
+            },
+            {
+                name: "JUN '26", gold: 63.50, usd: 500, egpBalance: 50300,
+                bank: 47300, vfCash: 2500, cash: 500,
+                totalEGP: 487675, expenses: 6500, saveDeficit: -15175,
+                rateGold: 5300, rateUSD: 50,
+                transactions: [
+                    { gold: 0, usd: -900, egp: 44000, notes: '' },
+                    { gold: 0, usd: 0, egp: 39900, notes: 'Salary' },
+                    { gold: 0, usd: 0, egp: 3500, notes: 'CAR LICENSE' },
+                    { gold: 0, usd: 0, egp: -50000, notes: 'MY HOME' },
+                    { gold: 2.5, usd: 0, egp: -18000, notes: '' }
+                ]
+            }
+        ];
+        /*__DATA_END__*/
+
+        // Data lives IN the HTML file — no localStorage needed
+        let monthsData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+
+        function loadData() {
+            monthsData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        }
+
+        function saveData() {
+            // Data is kept in memory; use Download to persist permanently
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // DOWNLOAD / SHARE — Bakes current data INTO the HTML file
+        // ══════════════════════════════════════════════════════════
+
+        function generateDataJS(data) {
+            // Pretty-print the data array as JS source code
+            let lines = [];
+            lines.push('        /*__DATA_START__*/');
+            lines.push('        const DEFAULT_DATA = ' + JSON.stringify(data, null, 4)
+                .split('\n').map((l, i) => i === 0 ? l : '        ' + l).join('\n') + ';');
+            lines.push('        /*__DATA_END__*/');
+            return lines.join('\n');
+        }
+
+        function downloadHTML() {
+            // Get the full HTML source
+            const fullHTML = document.documentElement.outerHTML;
+            const doctype = '<!DOCTYPE html>\n';
+
+            // Find and replace the data block between markers
+            const startMarker = '/*__DATA_START__*/';
+            const endMarker = '/*__DATA_END__*/';
+            const startIdx = fullHTML.indexOf(startMarker);
+            const endIdx = fullHTML.indexOf(endMarker) + endMarker.length;
+
+            if (startIdx === -1 || endIdx === -1) {
+                showToast('Error: Could not find data markers in HTML', 'error');
+                return;
+            }
+
+            const newDataBlock = generateDataJS(monthsData);
+            const newHTML = doctype + fullHTML.substring(0, startIdx) + newDataBlock + fullHTML.substring(endIdx);
+
+            // Trigger download
+            const blob = new Blob([newHTML], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'SPEND_ANALYSIS.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('HTML downloaded! Share this file — all data is included ✅');
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // TAB NAVIGATION
+        // ══════════════════════════════════════════════════════════
+
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+
+                if (tab.dataset.tab === 'chart') {
+                    setTimeout(() => {
+                        renderMainChart();
+                        renderGoldChart();
+                        renderUSDChart();
+                    }, 100);
+                }
+                if (tab.dataset.tab === 'dashboard') {
+                    setTimeout(() => renderMiniChart(), 100);
+                }
+                if (tab.dataset.tab === 'add') {
+                    populatePrevMonth();
+                }
+            });
+        });
+
+        // ══════════════════════════════════════════════════════════
+        // FORMAT HELPERS
+        // ══════════════════════════════════════════════════════════
+
+        function fmt(num) {
+            if (num == null || isNaN(num)) return '—';
+            return Number(num).toLocaleString('en-US', { maximumFractionDigits: 2 });
+        }
+
+        function fmtSign(num) {
+            if (num == null || isNaN(num)) return '—';
+            const prefix = num > 0 ? '+' : '';
+            return prefix + fmt(num);
+        }
+
+        function signClass(num) {
+            if (num > 0) return 'positive';
+            if (num < 0) return 'negative';
+            return '';
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // TOAST NOTIFICATIONS
+        // ══════════════════════════════════════════════════════════
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✅' : '❌';
+            toast.innerHTML = `${icon} ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // DASHBOARD TAB
+        // ══════════════════════════════════════════════════════════
+
+        function renderDashboard() {
+            const last = monthsData[monthsData.length - 1];
+            if (!last) return;
+
+            const summaryCards = document.getElementById('summaryCards');
+            summaryCards.innerHTML = `
+                <div class="summary-card gold">
+                    <div class="summary-label">Gold Holdings</div>
+                    <div class="summary-value">${fmt(last.gold)} gm</div>
+                    <div class="summary-sub">24K Gold</div>
+                </div>
+                <div class="summary-card usd">
+                    <div class="summary-label">USD Holdings</div>
+                    <div class="summary-value">$${fmt(last.usd)}</div>
+                    <div class="summary-sub">US Dollar</div>
+                </div>
+                <div class="summary-card egp">
+                    <div class="summary-label">EGP Balance</div>
+                    <div class="summary-value">${fmt(last.egpBalance)}</div>
+                    <div class="summary-sub">Bank: ${fmt(last.bank)} · Cash: ${fmt(last.cash)} · VF: ${fmt(last.vfCash)}</div>
+                </div>
+                <div class="summary-card total">
+                    <div class="summary-label">Total Portfolio</div>
+                    <div class="summary-value">${fmt(last.totalEGP)}</div>
+                    <div class="summary-sub">All assets in EGP</div>
+                </div>
+                <div class="summary-card expense">
+                    <div class="summary-label">Last Expenses</div>
+                    <div class="summary-value">${fmt(last.expenses)}</div>
+                    <div class="summary-sub">${last.name}</div>
+                </div>
+                <div class="summary-card save">
+                    <div class="summary-label">Save / Deficit</div>
+                    <div class="summary-value ${signClass(last.saveDeficit)}">${fmtSign(last.saveDeficit)}</div>
+                    <div class="summary-sub">${last.name}</div>
+                </div>
+            `;
+
+            // Last Month Detail
+            const detail = document.getElementById('lastMonthDetail');
+            const prev = monthsData.length > 1 ? monthsData[monthsData.length - 2] : null;
+            const totalChange = prev ? last.totalEGP - prev.totalEGP : 0;
+            detail.innerHTML = `
+                <div class="form-grid">
+                    <div>
+                        <div class="summary-label">Month</div>
+                        <div style="font-size:1.2rem; font-weight:700; color:var(--accent-indigo);">${last.name}</div>
+                    </div>
+                    <div>
+                        <div class="summary-label">Portfolio Change</div>
+                        <div style="font-size:1.2rem; font-weight:700;" class="${signClass(totalChange)}">${fmtSign(totalChange)} EGP</div>
+                    </div>
+                    <div>
+                        <div class="summary-label">Expenses</div>
+                        <div style="font-size:1.2rem; font-weight:700; color:var(--accent-rose);">${fmt(last.expenses)} EGP</div>
+                    </div>
+                    <div>
+                        <div class="summary-label">Save/Deficit</div>
+                        <div style="font-size:1.2rem; font-weight:700;" class="${signClass(last.saveDeficit)}">${fmtSign(last.saveDeficit)} EGP</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // MONTHS TABLE
+        // ══════════════════════════════════════════════════════════
+
+        function renderTable() {
+            const tbody = document.getElementById('monthsTableBody');
+            tbody.innerHTML = monthsData.map((m, i) => `
+                <tr>
+                    <td>${m.name}</td>
+                    <td>${fmt(m.gold)}</td>
+                    <td>${fmt(m.usd)}</td>
+                    <td>${fmt(m.egpBalance)}</td>
+                    <td>${fmt(m.bank)}</td>
+                    <td>${fmt(m.vfCash)}</td>
+                    <td>${fmt(m.cash)}</td>
+                    <td style="font-weight:700;">${fmt(m.totalEGP)}</td>
+                    <td class="negative">${fmt(m.expenses)}</td>
+                    <td class="${signClass(m.saveDeficit)}" style="font-weight:700;">${fmtSign(m.saveDeficit)}</td>
+                    <td>
+                        <button class="delete-month-btn" onclick="deleteMonth(${i})" title="Delete ${m.name}">✕</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteMonth(index) {
+            if (!confirm(`Delete "${monthsData[index].name}"? This cannot be undone.`)) return;
+            monthsData.splice(index, 1);
+            saveData();
+            renderAll();
+            showToast('Month deleted');
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // CHARTS
+        // ══════════════════════════════════════════════════════════
+
+        let mainChartInstance = null;
+        let miniChartInstance = null;
+        let goldChartInstance = null;
+        let usdChartInstance = null;
+
+        const chartColors = {
+            totalEGP: { bg: 'rgba(99, 102, 241, 0.7)', border: '#818cf8' },
+            expenses: { bg: 'rgba(251, 113, 133, 0.7)', border: '#fb7185' },
+            saveDeficit: { bg: 'rgba(34, 211, 238, 0.7)', border: '#22d3ee' },
+            gold: { bg: 'rgba(251, 191, 36, 0.7)', border: '#fbbf24' },
+            usd: { bg: 'rgba(52, 211, 153, 0.7)', border: '#34d399' },
+            egpBalance: { bg: 'rgba(96, 165, 250, 0.7)', border: '#60a5fa' },
+        };
+
+        const seriesLabels = {
+            totalEGP: 'Total (EGP)',
+            expenses: 'Expenses',
+            saveDeficit: 'Save/Deficit',
+            gold: 'Gold (gm)',
+            usd: 'USD',
+            egpBalance: 'EGP Balance',
+        };
+
+        function getActiveSeries() {
+            const active = [];
+            document.querySelectorAll('.chart-filter-btn.active').forEach(btn => {
+                active.push(btn.dataset.series);
+            });
+            return active;
+        }
+
+        // Toggle chart filter buttons
+        document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
+                renderMainChart();
+            });
+        });
+
+        function renderMainChart() {
+            const ctx = document.getElementById('mainChart');
+            if (!ctx) return;
+            if (mainChartInstance) mainChartInstance.destroy();
+
+            const labels = monthsData.map(m => m.name);
+            const activeSeries = getActiveSeries();
+
+            const datasets = activeSeries.map(key => ({
+                label: seriesLabels[key],
+                data: monthsData.map(m => m[key] || 0),
+                backgroundColor: chartColors[key].bg,
+                borderColor: chartColors[key].border,
+                borderWidth: 2,
+                borderRadius: 6,
+                borderSkipped: false,
+            }));
+
+            mainChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#94a3b8',
+                                font: { family: 'Inter', size: 12, weight: 500 },
+                                usePointStyle: true,
+                                pointStyle: 'rectRounded',
+                                padding: 16,
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            borderColor: 'rgba(99, 102, 241, 0.3)',
+                            borderWidth: 1,
+                            cornerRadius: 10,
+                            padding: 14,
+                            titleFont: { family: 'Inter', size: 13, weight: 700 },
+                            bodyFont: { family: 'Inter', size: 12 },
+                            callbacks: {
+                                label: function(ctx) {
+                                    return `${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                            grid: { color: 'rgba(99, 102, 241, 0.06)' },
+                        },
+                        y: {
+                            ticks: {
+                                color: '#64748b',
+                                font: { family: 'Inter', size: 11 },
+                                callback: val => fmt(val),
+                            },
+                            grid: { color: 'rgba(99, 102, 241, 0.06)' },
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderMiniChart() {
+            const ctx = document.getElementById('miniChart');
+            if (!ctx) return;
+            if (miniChartInstance) miniChartInstance.destroy();
+
+            miniChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthsData.map(m => m.name),
+                    datasets: [{
+                        label: 'Total Portfolio (EGP)',
+                        data: monthsData.map(m => m.totalEGP),
+                        borderColor: '#818cf8',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#818cf8',
+                        pointBorderColor: '#0a0e1a',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: { family: 'Inter', size: 12, weight: 500 },
+                                usePointStyle: true,
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            borderColor: 'rgba(99, 102, 241, 0.3)',
+                            borderWidth: 1,
+                            cornerRadius: 10,
+                            padding: 14,
+                            callbacks: {
+                                label: ctx => `Total: ${fmt(ctx.parsed.y)} EGP`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                            grid: { color: 'rgba(99, 102, 241, 0.06)' },
+                        },
+                        y: {
+                            ticks: {
+                                color: '#64748b',
+                                font: { family: 'Inter', size: 11 },
+                                callback: val => fmt(val),
+                            },
+                            grid: { color: 'rgba(99, 102, 241, 0.06)' },
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderGoldChart() {
+            const ctx = document.getElementById('goldChart');
+            if (!ctx) return;
+            if (goldChartInstance) goldChartInstance.destroy();
+
+            goldChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthsData.map(m => m.name),
+                    datasets: [{
+                        label: 'Gold (grams 24K)',
+                        data: monthsData.map(m => m.gold),
+                        borderColor: '#fbbf24',
+                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#fbbf24',
+                        pointBorderColor: '#0a0e1a',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: { family: 'Inter', size: 12, weight: 500 },
+                                usePointStyle: true,
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            borderColor: 'rgba(251, 191, 36, 0.3)',
+                            borderWidth: 1,
+                            cornerRadius: 10,
+                            padding: 14,
+                            callbacks: {
+                                label: ctx => `Gold: ${ctx.parsed.y} gm`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                            grid: { color: 'rgba(99, 102, 241, 0.06)' },
+                        },
+                        y: {
+                            ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                            grid: { color: 'rgba(99, 102, 241, 0.06)' },
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderUSDChart() {
+            const ctx = document.getElementById('usdChart');
+            if (!ctx) return;
+            if (usdChartInstance) usdChartInstance.destroy();
+
+            usdChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthsData.map(m => m.name),
+                    datasets: [{
+                        label: 'USD Holdings',
+                        data: monthsData.map(m => m.usd),
+                        borderColor: '#34d399',
+                        backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#34d399',
+                        pointBorderColor: '#0a0e1a',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: { family: 'Inter', size: 12, weight: 500 },
+                                usePointStyle: true,
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            borderColor: 'rgba(52, 211, 153, 0.3)',
+                            borderWidth: 1,
+                            cornerRadius: 10,
+                            padding: 14,
+                            callbacks: {
+                                label: ctx => `USD: $${fmt(ctx.parsed.y)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                            grid: { color: 'rgba(99, 102, 241, 0.06)' },
+                        },
+                        y: {
+                            ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                            grid: { color: 'rgba(99, 102, 241, 0.06)' },
+                        }
+                    }
+                }
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // ADD MONTH FORM
+        // ══════════════════════════════════════════════════════════
+
+        let txRowCount = 0;
+
+        function addTransactionRow() {
+            txRowCount++;
+            const container = document.getElementById('txRows');
+            const row = document.createElement('div');
+            row.className = 'tx-row';
+            row.id = `tx-row-${txRowCount}`;
+            row.innerHTML = `
+                <span class="tx-num">${txRowCount}</span>
+                <input type="number" step="0.01" placeholder="0" class="tx-gold">
+                <input type="number" step="0.01" placeholder="0" class="tx-usd">
+                <input type="number" step="0.01" placeholder="0" class="tx-egp">
+                <input type="text" placeholder="Notes..." class="tx-notes">
+                <button class="tx-remove-btn" onclick="removeTransactionRow('tx-row-${txRowCount}')">✕</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function removeTransactionRow(id) {
+            document.getElementById(id).remove();
+            renumberRows();
+        }
+
+        function renumberRows() {
+            const rows = document.querySelectorAll('#txRows .tx-row');
+            rows.forEach((row, i) => {
+                row.querySelector('.tx-num').textContent = i + 1;
+            });
+        }
+
+        function populatePrevMonth() {
+            if (monthsData.length === 0) {
+                document.getElementById('prevGold').value = '';
+                document.getElementById('prevUSD').value = '';
+                document.getElementById('prevEGP').value = '';
+                return;
+            }
+            const last = monthsData[monthsData.length - 1];
+            document.getElementById('prevGold').value = last.gold;
+            document.getElementById('prevUSD').value = last.usd;
+            document.getElementById('prevEGP').value = last.egpBalance;
+        }
+
+        function resetForm() {
+            document.getElementById('newMonthName').value = '';
+            document.getElementById('rateGold').value = '';
+            document.getElementById('rateUSD').value = '';
+            document.getElementById('bdBank').value = '';
+            document.getElementById('bdVFCash').value = '';
+            document.getElementById('bdCash').value = '';
+            document.getElementById('txRows').innerHTML = '';
+            txRowCount = 0;
+            addTransactionRow();
+            addTransactionRow();
+            addTransactionRow();
+            populatePrevMonth();
+        }
+
+        function saveMonth() {
+            const name = document.getElementById('newMonthName').value.trim();
+            if (!name) {
+                showToast('Please enter a month name', 'error');
+                return;
+            }
+
+            const rateGold = parseFloat(document.getElementById('rateGold').value);
+            const rateUSD = parseFloat(document.getElementById('rateUSD').value);
+
+            if (isNaN(rateGold) || rateGold <= 0) {
+                showToast('Please enter a valid Gold → EGP conversion rate', 'error');
+                return;
+            }
+            if (isNaN(rateUSD) || rateUSD <= 0) {
+                showToast('Please enter a valid USD → EGP conversion rate', 'error');
+                return;
+            }
+
+            // Get previous month data
+            const prev = monthsData.length > 0 ? monthsData[monthsData.length - 1] : { gold: 0, usd: 0, egpBalance: 0 };
+
+            // Collect transactions
+            const txRows = document.querySelectorAll('#txRows .tx-row');
+            const transactions = [];
+            let sumGold = 0, sumUSD = 0, sumEGP = 0;
+
+            txRows.forEach(row => {
+                const g = parseFloat(row.querySelector('.tx-gold').value) || 0;
+                const u = parseFloat(row.querySelector('.tx-usd').value) || 0;
+                const e = parseFloat(row.querySelector('.tx-egp').value) || 0;
+                const n = row.querySelector('.tx-notes').value.trim();
+                if (g !== 0 || u !== 0 || e !== 0 || n) {
+                    transactions.push({ gold: g, usd: u, egp: e, notes: n });
+                }
+                sumGold += g;
+                sumUSD += u;
+                sumEGP += e;
+            });
+
+            // Calculate current balances
+            const currentGold = prev.gold + sumGold;
+            const currentUSD = prev.usd + sumUSD;
+
+            // EGP breakdown from user inputs
+            const bank = parseFloat(document.getElementById('bdBank').value) || 0;
+            const vfCash = parseFloat(document.getElementById('bdVFCash').value) || 0;
+            const cash = parseFloat(document.getElementById('bdCash').value) || 0;
+            const currentEGP = bank + vfCash + cash;
+
+            // Total in EGP (convert Gold and USD)
+            const totalEGP = Math.round((currentGold * rateGold) + (currentUSD * rateUSD) + currentEGP);
+
+            // Expenses = previous total - current total + income
+            // Using same approach as Excel: total difference in EGP balance + conversions
+            const goldChangeEGP = sumGold * rateGold;
+            const usdChangeEGP = sumUSD * rateUSD;
+            const totalIncome = sumEGP + goldChangeEGP + usdChangeEGP;
+            const egpSpent = prev.egpBalance + sumEGP - currentEGP;
+            const expenses = Math.max(0, egpSpent);
+
+            // Save/Deficit
+            const prevTotal = monthsData.length > 0 ? prev.totalEGP : 0;
+            const saveDeficit = totalEGP - prevTotal - expenses;
+
+            const month = {
+                name,
+                gold: currentGold,
+                usd: currentUSD,
+                egpBalance: currentEGP,
+                bank, vfCash, cash,
+                totalEGP,
+                expenses,
+                saveDeficit,
+                rateGold, rateUSD,
+                transactions
+            };
+
+            monthsData.push(month);
+            renderAll();
+            resetForm();
+            showToast(`${name} added! Click "📥 Download & Share" to save permanently.`);
+
+            // Switch to dashboard
+            document.querySelector('[data-tab="dashboard"]').click();
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // RENDER ALL
+        // ══════════════════════════════════════════════════════════
+
+        function renderAll() {
+            renderDashboard();
+            renderTable();
+            renderMiniChart();
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // INIT
+        // ══════════════════════════════════════════════════════════
+
+        loadData();
+        renderAll();
+        resetForm();
+
+        // Initial mini chart
+        setTimeout(() => renderMiniChart(), 200);
+    </script>
+</body>
+</html>
