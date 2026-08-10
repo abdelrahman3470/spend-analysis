@@ -1,0 +1,600 @@
+[
+  {
+    "name": "APR '25",
+    "gold": 20.75,
+    "usd": 2250,
+    "egpBalance": 20900,
+    "bank": 16700,
+    "vfCash": 200,
+    "cash": 1000,
+    "totalEGP": 287853,
+    "expenses": 9250,
+    "saveDeficit": 24734,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0.25,
+        "usd": 100,
+        "egp": 17100,
+        "notes": ""
+      },
+      {
+        "gold": 0.5,
+        "usd": -50,
+        "egp": 14000,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": -200,
+        "egp": 3500,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 50,
+        "egp": 0,
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "name": "MAY '25",
+    "gold": 20.75,
+    "usd": 2200,
+    "egpBalance": 47000,
+    "bank": 37400,
+    "vfCash": 3600,
+    "cash": 5000,
+    "totalEGP": 289576,
+    "expenses": 3600,
+    "saveDeficit": 23723,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": -50,
+        "egp": 11800,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 15400,
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "name": "JUN '25",
+    "gold": 20.75,
+    "usd": 2300,
+    "egpBalance": 62300,
+    "bank": 55800,
+    "vfCash": 2500,
+    "cash": 3000,
+    "totalEGP": 309630,
+    "expenses": 14100,
+    "saveDeficit": 20054,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": 100,
+        "egp": 16650,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 12500,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -2750,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 5000,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 1500,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -3500,
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "name": "JUL '25",
+    "gold": 30.75,
+    "usd": 2600,
+    "egpBalance": 27050,
+    "bank": 22800,
+    "vfCash": 250,
+    "cash": 4000,
+    "totalEGP": 355142,
+    "expenses": 11350,
+    "saveDeficit": 45512,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 10,
+        "usd": 100,
+        "egp": 16400,
+        "notes": "EURO"
+      },
+      {
+        "gold": 0,
+        "usd": 200,
+        "egp": 20000,
+        "notes": "SUNJEC"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -2550,
+        "notes": "S.F_SUNJEC"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -450,
+        "notes": "M.A_SUNJEC"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -53700,
+        "notes": "10 GM BTC"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -3600,
+        "notes": "MSC"
+      }
+    ]
+  },
+  {
+    "name": "AUG '25",
+    "gold": 30.75,
+    "usd": 2600,
+    "egpBalance": 47400,
+    "bank": 46000,
+    "vfCash": 400,
+    "cash": 1000,
+    "totalEGP": 375492,
+    "expenses": 11850,
+    "saveDeficit": 20350,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 20100,
+        "notes": "EURO"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 14350,
+        "notes": "SUNJEC"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -2250,
+        "notes": "M.A_SUNJEC"
+      }
+    ]
+  },
+  {
+    "name": "SEP1 '25",
+    "gold": 30.5,
+    "usd": 2600,
+    "egpBalance": 51600,
+    "bank": 14000,
+    "vfCash": 600,
+    "cash": 37000,
+    "totalEGP": 378029,
+    "expenses": 10050,
+    "saveDeficit": 2538,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": -0.25,
+        "usd": 0,
+        "egp": 19250,
+        "notes": "GOLD COIN 0.5"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -5000,
+        "notes": "LEND KAREEM"
+      }
+    ]
+  },
+  {
+    "name": "SEP2 '25",
+    "gold": 30.5,
+    "usd": 2600,
+    "egpBalance": 32300,
+    "bank": 29000,
+    "vfCash": 300,
+    "cash": 3000,
+    "totalEGP": 358729,
+    "expenses": 31900,
+    "saveDeficit": -19300,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 17600,
+        "notes": "Salary"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -5000,
+        "notes": "Lend Kareem"
+      }
+    ]
+  },
+  {
+    "name": "OCT '25",
+    "gold": 42.5,
+    "usd": 1400,
+    "egpBalance": 27800,
+    "bank": 19400,
+    "vfCash": 2700,
+    "cash": 5700,
+    "totalEGP": 376981,
+    "expenses": 15800,
+    "saveDeficit": 18252,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 10,
+        "usd": -1200,
+        "egp": 0,
+        "notes": ""
+      },
+      {
+        "gold": 2,
+        "usd": 0,
+        "egp": 0,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 0,
+        "notes": "Salary"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -1000,
+        "notes": "Lent Sara"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -11600,
+        "notes": "SILVER"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -64700,
+        "notes": "GOLD 4*2.5"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 57000,
+        "notes": "1200 USD TO EGP"
+      }
+    ]
+  },
+  {
+    "name": "NOV '25",
+    "gold": 45,
+    "usd": 1400,
+    "egpBalance": 31350,
+    "bank": 29000,
+    "vfCash": 2000,
+    "cash": 350,
+    "totalEGP": 397072,
+    "expenses": 9120,
+    "saveDeficit": 20175,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 2.5,
+        "usd": 0,
+        "egp": 29000,
+        "notes": "Salary"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -16330,
+        "notes": "2.5 GM 24K"
+      }
+    ]
+  },
+  {
+    "name": "DEC '25",
+    "gold": 45,
+    "usd": 1400,
+    "egpBalance": 52900,
+    "bank": 51950,
+    "vfCash": 650,
+    "cash": 300,
+    "totalEGP": 418944,
+    "expenses": 10950,
+    "saveDeficit": 21872,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 32500,
+        "notes": "Salary"
+      }
+    ]
+  },
+  {
+    "name": "JAN '26",
+    "gold": 50,
+    "usd": 1400,
+    "egpBalance": 35100,
+    "bank": 32000,
+    "vfCash": 800,
+    "cash": 2300,
+    "totalEGP": 526894,
+    "expenses": 10400,
+    "saveDeficit": 25022,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 5,
+        "usd": 0,
+        "egp": 32000,
+        "notes": "Salary"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -34600,
+        "notes": "2.5 GOLD"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -2200,
+        "notes": "LENT SARA"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -1000,
+        "notes": "ABY"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -1600,
+        "notes": "SARA DOCTOR"
+      }
+    ]
+  },
+  {
+    "name": "FEB '26",
+    "gold": 50,
+    "usd": 1400,
+    "egpBalance": 67800,
+    "bank": 60500,
+    "vfCash": 300,
+    "cash": 7000,
+    "totalEGP": 555600,
+    "expenses": 18550,
+    "saveDeficit": 32700,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 36250,
+        "notes": "Salary"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 5000,
+        "notes": "ANNUAL RAISE"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 5000,
+        "notes": "KAREEM LENT"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 5000,
+        "notes": "Mistake ANNUAL RAISE"
+      }
+    ]
+  },
+  {
+    "name": "MAR '26",
+    "gold": 57.5,
+    "usd": 1400,
+    "egpBalance": 16200,
+    "bank": 12300,
+    "vfCash": 800,
+    "cash": 3100,
+    "totalEGP": 566250,
+    "expenses": 17800,
+    "saveDeficit": 10650,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 29500,
+        "notes": "Salary"
+      },
+      {
+        "gold": 5,
+        "usd": 0,
+        "egp": -42300,
+        "notes": ""
+      },
+      {
+        "gold": 2.5,
+        "usd": 0,
+        "egp": -21000,
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "name": "APR '26",
+    "gold": 57.5,
+    "usd": 1400,
+    "egpBalance": 43000,
+    "bank": 38600,
+    "vfCash": 1000,
+    "cash": 3400,
+    "totalEGP": 577900,
+    "expenses": 7200,
+    "saveDeficit": 26800,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 34000,
+        "notes": "Salary"
+      }
+    ]
+  },
+  {
+    "name": "MAY '26",
+    "gold": 61,
+    "usd": 1400,
+    "egpBalance": 37400,
+    "bank": 25500,
+    "vfCash": 2100,
+    "cash": 9800,
+    "totalEGP": 600300,
+    "expenses": 9600,
+    "saveDeficit": 22400,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 2.5,
+        "usd": 0,
+        "egp": 35200,
+        "notes": "Salary"
+      },
+      {
+        "gold": 1,
+        "usd": 0,
+        "egp": -19800,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -7900,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -3500,
+        "notes": "Car License"
+      }
+    ]
+  },
+  {
+    "name": "JUN '26",
+    "gold": 63.5,
+    "usd": 500,
+    "egpBalance": 50300,
+    "bank": 47300,
+    "vfCash": 2500,
+    "cash": 500,
+    "totalEGP": 487675,
+    "expenses": 6500,
+    "saveDeficit": -15175,
+    "rateGold": 5300,
+    "rateUSD": 50,
+    "transactions": [
+      {
+        "gold": 0,
+        "usd": -900,
+        "egp": 44000,
+        "notes": ""
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 39900,
+        "notes": "Salary"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": 3500,
+        "notes": "CAR LICENSE"
+      },
+      {
+        "gold": 0,
+        "usd": 0,
+        "egp": -50000,
+        "notes": "MY HOME"
+      },
+      {
+        "gold": 2.5,
+        "usd": 0,
+        "egp": -18000,
+        "notes": ""
+      }
+    ]
+  }
+]
