@@ -1520,12 +1520,27 @@
             `).join('');
         }
 
-        function deleteMonth(index) {
+        async function deleteMonth(index) {
             if (!confirm(`Delete "${monthsData[index].name}"? This cannot be undone.`)) return;
+            
+            const originalData = [...monthsData];
             monthsData.splice(index, 1);
-            saveData();
+            
+            // Re-render UI immediately for responsiveness
             renderAll();
-            showToast('Month deleted');
+            showToast('Deleting from GitHub... ⏳');
+            
+            // Push the change to GitHub
+            const success = await saveToGithub(monthsData);
+            
+            if (success) {
+                showToast('Month permanently deleted from GitHub! ✅');
+            } else {
+                // Revert if save failed
+                monthsData = originalData;
+                renderAll();
+                showToast('Failed to delete from GitHub. Restored.', 'error');
+            }
         }
 
         // ══════════════════════════════════════════════════════════
